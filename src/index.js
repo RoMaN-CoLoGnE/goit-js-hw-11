@@ -26,40 +26,49 @@ const simplelightbox = new SimpleLightbox('.gallery a', {
 async function onFormSubmit(evt) {
   evt.preventDefault();
   const value = evt.target.elements.searchQuery.value.trim();
+
   if (!value) {
     return Notiflix.Notify.info('Please input your request!');
   }
   apiPixabay.resetPage();
   apiPixabay.setSearchValue(value);
-  const {
-    data: { hits, totalHits },
-  } = await apiPixabay.getImages();
-  if (!hits.length) {
-    Notiflix.Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
-    loadMoreBtnHidden();
-    galleryRef.innerHTML = '';
-    return;
+  try {
+    const {
+      data: { hits, totalHits },
+    } = await apiPixabay.getImages();
+    if (!hits.length) {
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+      loadMoreBtnHidden();
+      galleryRef.innerHTML = '';
+      return;
+    }
+    apiPixabay.setTotalHits(totalHits);
+    Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+    const markup = getImagesMarkup(getNormalizedImages(hits));
+    galleryRef.innerHTML = markup;
+    simplelightbox.refresh();
+    apiPixabay.checkLastPage() ? loadMoreBtnHidden() : loadMoreBtnShow();
+  } catch (error) {
+    console.log(error.message);
   }
-  apiPixabay.setTotalHits(totalHits);
-  Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
-  const markup = getImagesMarkup(getNormalizedImages(hits));
-  galleryRef.innerHTML = markup;
-  simplelightbox.refresh();
-  apiPixabay.checkLastPage() ? loadMoreBtnHidden() : loadMoreBtnShow();
 }
 
 async function onLoadMoreBtnClick(evt) {
   apiPixabay.incrementPage();
-  const {
-    data: { hits, totalHits },
-  } = await apiPixabay.getImages();
-  const markup = getImagesMarkup(getNormalizedImages(hits));
-  galleryRef.insertAdjacentHTML('beforeend', markup);
-  simplelightbox.refresh();
-  onScrollPage();
-  apiPixabay.checkLastPage() ? loadMoreBtnHidden() : loadMoreBtnShow();
+  try {
+    const {
+      data: { hits, totalHits },
+    } = await apiPixabay.getImages();
+    const markup = getImagesMarkup(getNormalizedImages(hits));
+    galleryRef.insertAdjacentHTML('beforeend', markup);
+    simplelightbox.refresh();
+    onScrollPage();
+    apiPixabay.checkLastPage() ? loadMoreBtnHidden() : loadMoreBtnShow();
+  } catch (error) {
+    console.log(error.message);
+  }
 }
 
 function loadMoreBtnHidden() {

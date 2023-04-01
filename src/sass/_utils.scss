@@ -1,0 +1,28 @@
+@mixin container($w: 480px, $mar: 0 auto, $pad: 20px 15px) {
+  @if $w {
+    max-width: $w;
+
+    @media screen and(min-width: 768px) {
+      max-width: 768px;
+    }
+
+    @media screen and(min-width: 1200px) {
+      max-width: 1200px;
+    }
+  }
+
+  @if $mar {
+    margin: $mar;
+  }
+
+  @if $pad {
+    padding: $pad;
+  }
+}
+
+// grid mixin
+@mixin grid($indent: 30px) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $indent;
+}
