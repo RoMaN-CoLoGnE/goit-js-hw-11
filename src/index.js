@@ -23,37 +23,80 @@ const simplelightbox = new SimpleLightbox('.gallery a', {
   scrollZoom: false,
 });
 
-async function onFormSubmit(evt) {
-  evt.preventDefault();
-  const value = evt.target.elements.searchQuery.value.trim();
+async function onFormSubmit(event) {
+  event.preventDefault();
 
-  if (!value) {
-    return Notiflix.Notify.info('Please input your request!');
+  const searchValue = event.target.elements.searchQuery.value.trim();
+
+  if (!searchValue) {
+    Notiflix.Notify.info('Please input your request!');
+    return;
   }
+
   apiPixabay.resetPage();
-  apiPixabay.setSearchValue(value);
+  apiPixabay.setSearchValue(searchValue);
+
   try {
     const {
       data: { hits, totalHits },
     } = await apiPixabay.getImages();
+
     if (!hits.length) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
-      loadMoreBtnHidden();
       galleryRef.innerHTML = '';
-      return;
+      return loadMoreBtnHidden();
     }
+
     apiPixabay.setTotalHits(totalHits);
+
     Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
-    const markup = getImagesMarkup(getNormalizedImages(hits));
-    galleryRef.innerHTML = markup;
+
+    const normalizedHits = getNormalizedImages(hits);
+    const imagesMarkup = getImagesMarkup(normalizedHits);
+
+    galleryRef.innerHTML = imagesMarkup;
     simplelightbox.refresh();
+
     apiPixabay.checkLastPage() ? loadMoreBtnHidden() : loadMoreBtnShow();
   } catch (error) {
     console.log(error.message);
   }
 }
+
+// async function onFormSubmit(evt) {
+//   evt.preventDefault();
+
+//   const value = evt.target.elements.searchQuery.value.trim();
+
+//   if (!value) {
+//     return Notiflix.Notify.info('Please input your request!');
+//   }
+//   apiPixabay.resetPage();
+//   apiPixabay.setSearchValue(value);
+//   try {
+//     const {
+//       data: { hits, totalHits },
+//     } = await apiPixabay.getImages();
+//     if (!hits.length) {
+//       Notiflix.Notify.failure(
+//         'Sorry, there are no images matching your search query. Please try again.'
+//       );
+//       loadMoreBtnHidden();
+//       galleryRef.innerHTML = '';
+//       return;
+//     }
+//     apiPixabay.setTotalHits(totalHits);
+//     Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+//     const markup = getImagesMarkup(getNormalizedImages(hits));
+//     galleryRef.innerHTML = markup;
+//     simplelightbox.refresh();
+//     apiPixabay.checkLastPage() ? loadMoreBtnHidden() : loadMoreBtnShow();
+//   } catch (error) {
+//     console.log(error.message);
+//   }
+// }
 
 async function onLoadMoreBtnClick(evt) {
   apiPixabay.incrementPage();

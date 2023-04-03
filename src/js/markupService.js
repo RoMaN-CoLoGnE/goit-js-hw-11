@@ -1,3 +1,14 @@
+import { library, dom } from '@fortawesome/fontawesome-free';
+import {
+  faThumbsUp,
+  faEye,
+  faComments,
+  faCircleDown,
+} from '@fortawesome/fontawesome-free';
+
+library.add(faThumbsUp, faEye, faComments, faCircleDown);
+dom.watch();
+
 export function getImagesMarkup(array) {
   return array
     .map(
@@ -20,16 +31,16 @@ export function getImagesMarkup(array) {
       </div>
     <div class="info">
       <p class="info-item">
-        <b class="info-item__styles"><span class="info-item__icon">&#128402;</span> ${likes}</b>
+        <b class="info-item__styles"><span class="info-item__icon">${faThumbsUp.iconName}</span> ${likes}</b>
       </p>
       <p class="info-item">
-        <b class="info-item__styles"><span class="info-item__icon">&#128064;</span> ${views}</b>
+        <b class="info-item__styles"><span class="info-item__icon">${faEye.iconName}</span> ${views}</b>
       </p>
       <p class="info-item">
-        <b class="info-item__styles"><span class="info-item__icon">&#128398;</span> ${comments}</b>
+        <b class="info-item__styles"><span class="info-item__icon">${faComments.iconName}</span> ${comments}</b>
       </p>
       <p class="info-item">
-        <b class="info-item__styles"><span class="info-item__icon">&#11123;</span> ${downloads}</b>
+        <b class="info-item__styles"><span class="info-item__icon">${faCircleDown.iconName}</span> ${downloads}</b>
       </p>
     </div>
   </a>
