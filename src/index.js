@@ -1,10 +1,10 @@
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-
 import Notiflix from 'notiflix';
 import { ApiPixabay } from './js/apiPixabay';
 import { getNormalizedImages } from './js/utils';
 import { getImagesMarkup } from './js/markupService';
+import { setupCardRotation } from './js/cardRotateEffect';
 
 const galleryRef = document.querySelector('.gallery');
 const formRef = document.querySelector('.search-form');
@@ -58,46 +58,13 @@ async function onFormSubmit(event) {
 
     galleryRef.innerHTML = imagesMarkup;
     simplelightbox.refresh();
+    setupCardRotation();
 
     apiPixabay.checkLastPage() ? loadMoreBtnHidden() : loadMoreBtnShow();
   } catch (error) {
     console.log(error.message);
   }
 }
-
-// async function onFormSubmit(evt) {
-//   evt.preventDefault();
-
-//   const value = evt.target.elements.searchQuery.value.trim();
-
-//   if (!value) {
-//     return Notiflix.Notify.info('Please input your request!');
-//   }
-//   apiPixabay.resetPage();
-//   apiPixabay.setSearchValue(value);
-//   try {
-//     const {
-//       data: { hits, totalHits },
-//     } = await apiPixabay.getImages();
-//     if (!hits.length) {
-//       Notiflix.Notify.failure(
-//         'Sorry, there are no images matching your search query. Please try again.'
-//       );
-//       loadMoreBtnHidden();
-//       galleryRef.innerHTML = '';
-//       return;
-//     }
-//     apiPixabay.setTotalHits(totalHits);
-//     Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
-//     const markup = getImagesMarkup(getNormalizedImages(hits));
-//     galleryRef.innerHTML = markup;
-//     simplelightbox.refresh();
-//     apiPixabay.checkLastPage() ? loadMoreBtnHidden() : loadMoreBtnShow();
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// }
-
 async function onLoadMoreBtnClick(evt) {
   apiPixabay.incrementPage();
   try {
@@ -108,6 +75,7 @@ async function onLoadMoreBtnClick(evt) {
     galleryRef.insertAdjacentHTML('beforeend', markup);
     simplelightbox.refresh();
     onScrollPage();
+    setupCardRotation();
     apiPixabay.checkLastPage() ? loadMoreBtnHidden() : loadMoreBtnShow();
   } catch (error) {
     console.log(error.message);
